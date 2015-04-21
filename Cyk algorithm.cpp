@@ -7,13 +7,14 @@
 #include <map>
 #include <vector>
 #include <tuple>
+#include <utility>
 #include <iostream>
 using namespace std;
 
 const int NMAX = 50;
 
 map<string, vector<char> > reverseCNF;
-vector<tuple<char /*letter*/, char /*leftSon*/, char /*rightSon*/> > Cyk[NMAX][NMAX];
+vector<tuple<char /*letter*/, tuple<int,int,int> /*leftSon*/, tuple<int,int,int> /*rightSon*/> > Cyk[NMAX][NMAX];
 
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -38,7 +39,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		
 		for (int revState = 0; revState < reverseCNF[letter].size(); revState++)
 		{
-			Cyk[N][wordIndex].push_back(make_tuple(reverseCNF[letter][revState], '_', '_'));
+			Cyk[N][wordIndex].push_back(make_tuple(reverseCNF[letter][revState], make_tuple(0,0,0), make_tuple(0,0,0)));
 		}
 	}
 
@@ -62,7 +63,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 						for (int revState = 0; revState < reverseCNF[concLetters].size(); revState++)
 						{
-							Cyk[row][column].push_back(make_tuple(reverseCNF[concLetters][revState], letter1, letter2));
+							Cyk[row][column].push_back(make_tuple(reverseCNF[concLetters][revState], make_tuple(row + level, column,cellElem), make_tuple(N - level + 1, column + (N - level + 1 - row),neighbourElem)));
 
 						}
 					}
@@ -80,7 +81,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			out << "< ";
 			for (int cellElement = 0; cellElement < Cyk[row][column].size(); cellElement++)
-				out << "{" << get<0>(Cyk[row][column][cellElement]) << ", " << get<1>(Cyk[row][column][cellElement]) << ", " << get<2>(Cyk[row][column][cellElement]) << "}";
+				out << "{" << get<0>(Cyk[row][column][cellElement]) << ", "
+				<< get<0>(get<1>(Cyk[row][column][cellElement])) << ":" << get<1>(get<1>(Cyk[row][column][cellElement])) << ":" << get<2>(get<1>(Cyk[row][column][cellElement])) << ", "
+				<< get<0>(get<2>(Cyk[row][column][cellElement])) << ":" << get<1>(get<2>(Cyk[row][column][cellElement])) << ":" << get<2>(get<2>(Cyk[row][column][cellElement])) << "}";
 			out << "> ";
 		}
 		out << endl;
